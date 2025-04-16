@@ -5,7 +5,7 @@
 * ???
 
 ### Requirements
-* Any modern browser capable of runnign Javascript.
+* Any modern browser capable of running Javascript.
 * WebGL Compatible graphics drivers, you check this [here](https://get.webgl.org/).
 
 ### Credits
