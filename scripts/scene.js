@@ -4,10 +4,21 @@ import { GLTFLoader } from 'https://esm.sh/three@0.174.0/examples/jsm/loaders/GL
 // AI Assisted Code
 // It's a lot easier setting up the scene with 3JS than using raw WebGL.
 // However, our effect code will be written in raw WebGL (see models).
-const canvas = document.getElementById('webgl-canvas');
-const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.setSize(500, 500);
+// Get references to both canvases
+const canvas1 = document.getElementById('webgl-canvas-1');
+const canvas2 = document.getElementById('webgl-canvas-2');
 
+// Create two separate renderers
+const renderer1 = new THREE.WebGLRenderer({ canvas: canvas1 });
+const renderer2 = new THREE.WebGLRenderer({ canvas: canvas2 });
+
+// Set the size for both renderers
+renderer1.setSize(500, 500);
+renderer2.setSize(500, 500);
+
+//NOTE Both canvases are displaying the same scene.
+
+// Set the pixel ratio for both renderers
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(100, 1, 0.1, 1000);
 camera.position.z = 5;
@@ -38,7 +49,8 @@ export function handleButtonClick(fileName) { // Aslo used to load the initial m
       function animate() {
         requestAnimationFrame(animate);
         model.rotation.y += Math.PI / 720; // Rotate 0.25 degree per frame
-        renderer.render(scene, camera);
+        renderer1.render(scene, camera);
+        renderer2.render(scene, camera);
       }
       animate();
       console.log('Model loaded successfully:', modelPath);
@@ -49,6 +61,8 @@ export function handleButtonClick(fileName) { // Aslo used to load the initial m
     }
   );
 }
+
+
 
 // Load the initial model
 handleButtonClick('chips.glb');

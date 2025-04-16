@@ -9,15 +9,20 @@
     import { handleButtonClick } from './scripts/scene.js';
     window.handleButtonClick = handleButtonClick;
   </script>
-  <style>
-    body { margin: 0; }
-    canvas { display: block; margin: auto; }
-  </style>
 </head>
 <body>
-  <div style="width: 500px; height: 500px; margin: auto; margin-top: 35px;">
-    <canvas id="webgl-canvas" width="500" height="500"></canvas>
+  <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; margin: auto; margin-top: 35px;">
+    <div class="label-canvas-container">
+
+      <label for="webgl-canvas-1">WebGL Canvas 1</label>
+      <canvas id="webgl-canvas-1" width="500" height="500"></canvas>
     </div>
+    <div class="label-canvas-container">
+      <label for="webgl-canvas-2">WebGL Canvas 2</label>
+      <canvas id="webgl-canvas-2" width="500" height="500"></canvas>
+
+    </div>
+  </div>
   <center>
     <button id="chips-button" onclick="handleButtonClick('chips.glb')">Chips</button>
     <button id="banana-button" onclick="handleButtonClick('banana.glb')">Banana</button>
