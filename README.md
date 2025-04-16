@@ -1,7 +1,7 @@
 ![CIS367-02 FINAL PROJECT by ELijah Morgan & Dillon Moesch](./img/wordart.png)
 
 ### Included Shader Effects
-* ???
+* Chromatic Aberration (WIP)
 * ???
 
 ### Requirements
