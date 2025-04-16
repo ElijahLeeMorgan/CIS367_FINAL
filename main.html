@@ -5,6 +5,10 @@
   <meta charset="UTF-8" />
   <title>CIS367-02 FINAL</title>
   <link rel="stylesheet" href="main.css" />
+  <script type="module">
+    import { handleButtonClick } from './scripts/scene.js';
+    window.handleButtonClick = handleButtonClick;
+  </script>
   <style>
     body { margin: 0; }
     canvas { display: block; margin: auto; }
@@ -15,14 +19,14 @@
     <canvas id="webgl-canvas" width="500" height="500"></canvas>
     </div>
   <center>
-    <button id="chips-button">Chips</button>
-    <button id="banana-button">Banana</button>
-    <button id="cone-button">Cone</button>
+    <button id="chips-button" onclick="handleButtonClick('chips.glb')">Chips</button>
+    <button id="banana-button" onclick="handleButtonClick('banana.glb')">Banana</button>
+    <button id="cone-button" onclick="handleButtonClick('cone.glb')">Cone</button>
   
     <h3>CIS367-02 FINAL PROJECT</h3>
     <p>Elijah Morgan & Dillon Moesch</p>
   </center>
 
-  <script type="module" src="scripts/scene.js"></script>
+  
 </body>
 </html>

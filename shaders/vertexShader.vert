@@ -1,4 +1,4 @@
-// vertexShader.vert
+// AI Assisted Code
 varying vec3 vNormal;
 
 void main() {

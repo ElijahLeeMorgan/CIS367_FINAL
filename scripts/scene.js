@@ -18,26 +18,37 @@ sunlight.position.set(1, 1, 7.5);
 scene.add(sunlight);
 
 // Path to GLB/GLTF model
-const modelPath = '/models/chips.glb'
-
 const loader = new GLTFLoader();
-loader.load(
-  modelPath,
-  (glb) => {
-    const model = glb.scene;
-    scene.add(model);
 
-    // Spins model
-    function animate() {
-      requestAnimationFrame(animate);
-      model.rotation.y += Math.PI / 720; // Rotate 0.25 degree per frame
-      renderer.render(scene, camera);
-    }
+export function handleButtonClick(fileName) { // Aslo used to load the initial model
+  var modelPath = '/models/' + fileName;
+  console.log('Loading model:', modelPath);
 
-    animate();
-  },
-  undefined,
-  (error) => {
-    console.error('An error occurred while loading the model:', error);
+  // Remove all objects from the scene except the light and camera
+  while (scene.children.length > 1) {
+    scene.remove(scene.children[scene.children.length - 1]);
   }
-);
+
+  // Load the new model
+  loader.load(
+    modelPath,
+    (glb) => {
+      const model = glb.scene;
+      scene.add(model);
+      function animate() {
+        requestAnimationFrame(animate);
+        model.rotation.y += Math.PI / 720; // Rotate 0.25 degree per frame
+        renderer.render(scene, camera);
+      }
+      animate();
+      console.log('Model loaded successfully:', modelPath);
+    },
+    undefined,
+    (error) => {
+      console.error('An error occurred while loading the model:', error);
+    }
+  );
+}
+
+// Load the initial model
+handleButtonClick('chips.glb');
