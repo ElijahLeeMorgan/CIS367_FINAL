@@ -10,21 +10,17 @@ import { ShaderPass } from 'https://esm.sh/three@0.174.0/examples/jsm/postproces
 // Get references to both canvases
 const canvas1 = document.getElementById('webgl-canvas-1');
 const canvas2 = document.getElementById('webgl-canvas-2');
-const canvas3 = document.getElementById('webgl-canvas-3');
-const canvas4 = document.getElementById('webgl-canvas-4');
 
-const textureLoader = new THREE.TextureLoader();
-const bumpMap = textureLoader.load('/textures/Dust_Fibers_001.jpg'); // Replace with your texture path
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+const cubeTexture = cubeTextureLoader.load([
+  '/textures/posx.jpg', // +X
+  '/textures/negx.jpg', // -X
+  '/textures/posy.jpg', // +Y
+  '/textures/negy.jpg', // -Y
+  '/textures/posz.jpg', // +Z
+  '/textures/negz.jpg', // -Z
+]);
 
-function createBumpCube() {
-  const geometry = new THREE.BoxGeometry(2, 2, 2);
-  const material = new THREE.MeshPhongMaterial({
-    color: 0xaaaaaa,
-    bumpMap: bumpMap,
-    bumpScale: 0.05,
-  });
-  return new THREE.Mesh(geometry, material);
-}
 
 const ChromaticAberrationShader = {
   uniforms: {
@@ -56,14 +52,10 @@ const ChromaticAberrationShader = {
 // Create two separate renderers
 const renderer1 = new THREE.WebGLRenderer({ canvas: canvas1 });
 const renderer2 = new THREE.WebGLRenderer({ canvas: canvas2 });
-const renderer3 = new THREE.WebGLRenderer({ canvas: canvas3 });
-const renderer4 = new THREE.WebGLRenderer({ canvas: canvas4 });
 
 // Set the size for renderers
 renderer1.setSize(500, 500);
 renderer2.setSize(500, 500);
-renderer3.setSize(500, 500);
-renderer4.setSize(500, 500);
 
 //NOTE Both canvases are displaying the same scene.
 
@@ -84,12 +76,10 @@ const composer2 = new EffectComposer(renderer2);
 composer2.addPass(new RenderPass(scene, camera));
 composer2.addPass(new ShaderPass(ChromaticAberrationShader));
 
-const composer4 = new EffectComposer(renderer4);
-composer4.addPass(new RenderPass(scene, camera));
-composer4.addPass(new ShaderPass(ChromaticAberrationShader));
-
 let angle = 0;
 let radius = 5;
+let texture = 1;
+let basicTexture = scene.background
 const zoomSpeed = 0.02;
 
 let rotate = 1
@@ -151,7 +141,17 @@ export function handleButtonClick(fileName) {
   } if (fileName === "rotate") {
     rotate = (rotate + 1) % 2
     return
-  } else {
+  } if (fileName === "map") {
+    texture = (texture + 1) % 2
+      if (texture == 0) {
+      scene.background = cubeTexture;
+      return
+    } else {
+      scene.background = basicTexture;
+      return
+    }
+  }
+   else {
     clear()
     const modelPath = '/models/' + fileName;
     console.log('Loading model:', modelPath);
