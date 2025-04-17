@@ -1,0 +1,57 @@
+<!-- AI Assisted code-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CIS367-02 FINAL</title>
+  <link rel="stylesheet" href="main.css" />
+  <script type="module">
+    import { handleButtonClick } from './scripts/scene.js';
+    window.handleButtonClick = handleButtonClick;
+  </script>
+</head>
+<body>
+  <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; margin: auto; margin-top: 35px;">
+    <div class="label-canvas-container">
+
+      <label for="webgl-canvas-1">Basic</label>
+      <canvas id="webgl-canvas-1" width="500" height="500"></canvas>
+    </div>
+    <div class="label-canvas-container">
+      <label for="webgl-canvas-2">Chromatic Aberration</label>
+      <canvas id="webgl-canvas-2" width="500" height="500"></canvas>
+
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; margin: auto; margin-top: 35px;">
+    <div class="label-canvas-container">
+      <label for="webgl-canvas-3">Bump Mapping</label>
+      <canvas id="webgl-canvas-3" width="500" height="500"></canvas>
+
+    </div>
+    <div class="label-canvas-container">
+      <label for="webgl-canvas-4">Both</label>
+      <canvas id="webgl-canvas-4" width="500" height="500"></canvas>
+
+    </div>
+  </div>
+
+  
+
+  <center>
+    <button id="chips-button" onclick="handleButtonClick('chips.glb')">Chips</button>
+    <button id="banana-button" onclick="handleButtonClick('banana.glb')">Banana</button>
+    <button id="cone-button" onclick="handleButtonClick('cone.glb')">Cone</button>
+    <button id="cube-button" onclick="handleButtonClick('cube')">Cube</button>
+  
+    
+  </center>
+  <center>
+  <button id="rotate-button" onclick="handleButtonClick('rotate')">Rotate</button>
+  <h3>CIS367-02 FINAL PROJECT</h3>
+  <p>Elijah Morgan & Dillon Moesch</p>
+  </center>
+
+  
+</body>
+</html>
