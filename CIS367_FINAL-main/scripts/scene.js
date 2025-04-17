@@ -72,11 +72,9 @@ scene.add(sunlight);
 // Path to GLB/GLTF model
 const loader = new GLTFLoader();
 
-const chromaticPass = new ShaderPass(ChromaticAberrationShader);
-
 const composer2 = new EffectComposer(renderer2);
 composer2.addPass(new RenderPass(scene, camera));
-composer2.addPass(chromaticPass);
+composer2.addPass(new ShaderPass(ChromaticAberrationShader));
 
 let angle = 0;
 let radius = 5;
@@ -190,6 +188,7 @@ export function handleButtonClick(fileName) {
 
 let pitch = 0; // camera rotation around X axis (looking up/down)
 const rotationSpeed = 0.02;
+
 const axInput = document.getElementById('AX');
 const ayInput = document.getElementById('AY');
 
