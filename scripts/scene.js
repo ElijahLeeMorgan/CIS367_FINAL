@@ -107,9 +107,9 @@ function updateCameraControls() {
   camera.lookAt(0, 0, 0); // Always look at the center
 }
 
-function cube(x, y, z, color, shine) {
+function cube(x, y, z, color, shininess) {
   const cubeGeometry = new THREE.BoxGeometry(x, y, z);
-  const cubeMaterial = new THREE.MeshPhongMaterial({color, shine});
+  const cubeMaterial = new THREE.MeshPhongMaterial({color, shininess});
   const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
   cube.position.set(1, 0, 0); // Optional offset
   return cube
