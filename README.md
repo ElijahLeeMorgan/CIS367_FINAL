@@ -1,8 +1,8 @@
 ![CIS367-02 FINAL PROJECT by ELijah Morgan & Dillon Moesch](./img/wordart.png)
 
 ### Included Shader Effects
-* Chromatic Aberration
-* Cubemap
+* Chromatic Aberration (WIP)
+* ???
 
 ### Requirements
 * Any modern browser capable of running Javascript.
