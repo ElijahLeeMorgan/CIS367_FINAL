@@ -24,24 +24,25 @@
     </div>
   </div>
 
-
-  
-
   <center>
     <button id="chips-button" onclick="handleButtonClick('chips.glb')">Chips</button>
     <button id="banana-button" onclick="handleButtonClick('banana.glb')">Banana</button>
     <button id="cone-button" onclick="handleButtonClick('cone.glb')">Cone</button>
     <button id="cube-button" onclick="handleButtonClick('cube')">Cube</button>
-  
-    
   </center>
   <center>
-  <button id="rotate-button" onclick="handleButtonClick('rotate')">Rotate</button>
-  <button id="map-button" onclick="handleButtonClick('map')">Cube-map</button>
-  <h3>CIS367-02 FINAL PROJECT</h3>
-  <p>Elijah Morgan & Dillon Moesch</p>
+    <button id="rotate-button" onclick="handleButtonClick('rotate')">Rotate</button>
+    <button id="map-button" onclick="handleButtonClick('map')">Cube-map</button>
   </center>
+  <center>
+    <label for="quantity">Aberration X: </label>
+    <input type="number" min="-1000" max="1000" step=".001" value=".001" id="AX">
 
-  
+    <label for="quantity">Aberration Y: </label>
+    <input type="number" min="-1000" max="1000" step=".001" value=".001" id="AY">
+
+    <h3>CIS367-02 FINAL PROJECT</h3>
+    <p>Elijah Morgan & Dillon Moesch</p>
+  </center>
 </body>
 </html>

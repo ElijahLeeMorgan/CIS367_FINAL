@@ -120,6 +120,12 @@ function clear() {
   }
 }
 
+function updateAberration() {
+  const ax = parseFloat(axInput.value);
+  const ay = parseFloat(ayInput.value);
+  chromaticPass.uniforms.offset.value.set(ax, ay);
+}
+
 export function handleButtonClick(fileName) {
   // Remove all objects from the scene except the light and camera
 
@@ -183,6 +189,9 @@ export function handleButtonClick(fileName) {
 let pitch = 0; // camera rotation around X axis (looking up/down)
 const rotationSpeed = 0.02;
 
+const axInput = document.getElementById('AX');
+const ayInput = document.getElementById('AY');
+
 const keys = {
   w: false,
   a: false,
@@ -204,5 +213,8 @@ window.addEventListener('keyup', (e) => {
   }
 });
 
+// Listen for changes on both inputs
+axInput.addEventListener('input', updateAberration);
+ayInput.addEventListener('input', updateAberration);
 // Load the initial model
 handleButtonClick('chips.glb');
