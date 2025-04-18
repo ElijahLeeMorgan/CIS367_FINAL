@@ -2,15 +2,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+
   <title>CIS367-02 FINAL</title>
-  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- JS Input handling -->
   <script type="module">
     import { handleButtonClick } from './scripts/scene.js';
     window.handleButtonClick = handleButtonClick;
   </script>
+
+  <!-- WebGL -->
+  <script id="fs-phong" src="shaders/phong.frag" type="x-shader/x-fragment"></script>
+  <script id="vs-phong" src="shaders/phong.vert" type="x-shader/x-vertex"></script>
+  <script id="fs-chromatic" src="shaders/chromatic.frag" type="x-shader/x-fragment"></script>
+  <script id="vs-chromatic" src="shaders/chromatic.vert" type="x-shader/x-vertex"></script>
+
 </head>
-<body>
+<body onload="WebGLStart();">
   <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; margin: auto; margin-top: 35px;">
     <div class="label-canvas-container">
 

@@ -1,25 +1,13 @@
-#ifdef GL_ES
 precision mediump float;
-#endif
 
-uniform sampler2D u_texture; // Input texture
-uniform vec2 u_resolution;  // Resolution of the screen
-uniform vec2 u_offset;      // Chromatic aberration offset (X, Y)
-
-varying vec2 v_texCoord;
-
-// AI Assisted Code
+uniform sampler2D tDiffuse;
+uniform vec2 offset;
+varying vec2 vUv;
 void main() {
-  // Calculate texture coordinates for each color channel
-  vec2 redCoord = v_texCoord + (u_offset / u_resolution);
-  vec2 greenCoord = v_texCoord;
-  vec2 blueCoord = v_texCoord - (u_offset / u_resolution);
-
-  // Sample the texture for each color channel
-  float red = texture2D(u_texture, redCoord).r;
-  float green = texture2D(u_texture, greenCoord).g;
-  float blue = texture2D(u_texture, blueCoord).b;
-
-  // Combine the channels into the final color
-  gl_FragColor = vec4(red, green, blue, 1.0);
+  vec4 color;
+  color.r = texture2D(tDiffuse, vUv + offset).r;
+  color.g = texture2D(tDiffuse, vUv).g;
+  color.b = texture2D(tDiffuse, vUv - offset).b;
+  color.a = 1.0;
+  gl_FragColor = color;
 }
