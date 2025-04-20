@@ -4,7 +4,7 @@ import { EffectComposer } from 'https://esm.sh/three@0.174.0/examples/jsm/postpr
 import { RenderPass } from 'https://esm.sh/three@0.174.0/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'https://esm.sh/three@0.174.0/examples/jsm/postprocessing/ShaderPass.js';  
 
-// AI Assisted Code
+// AI Assisted Code. The whole file (or at least msot of it) is AI assisted.
 // It's a lot easier setting up the scene with 3JS than using raw WebGL.
 // However, our effect code will be written in raw WebGL (see models).
 // Get references to both canvases
@@ -21,11 +21,42 @@ const cubeTexture = cubeTextureLoader.load([
   '/textures/negz.jpg', // -Z
 ]);
 
-
+// Chromatic Aberration Shader
+const CAFrag = `
+  uniform sampler2D tDiffuse;
+  uniform vec2 offset;
+  varying vec2 vUv;
+  void main() {
+    vec4 color;
+    color.r = texture2D(tDiffuse, vUv + offset).r;
+    color.g = texture2D(tDiffuse, vUv).g;
+    color.b = texture2D(tDiffuse, vUv - offset).b;
+    color.a = 1.0;
+    gl_FragColor = color;
+  }`;
+const CAVert = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }`
 const ChromaticAberrationShader = {
   uniforms: {
     tDiffuse: { value: null },
     offset: { value: new THREE.Vector2(0.005, 0.005) },
+  },
+  vertexShader: CAVert,
+  fragmentShader: CAFrag
+};
+
+const phongShader = { //WIP
+  uniforms: {
+    ambientLightIntesity: new THREE.Vector3(),
+    directionalLight: { // Effectively a struct, 
+      direction: new THREE.Vector3(),
+      color: new THREE.Vector3(1, 1, 1),
+    },
+    texSampler: new THREE.Texture(cubeTexture), // Effectively WebGl's sampler2D
   },
   vertexShader: `
     varying vec2 vUv;
@@ -35,19 +66,23 @@ const ChromaticAberrationShader = {
     }
   `,
   fragmentShader: `
-    uniform sampler2D tDiffuse;
-    uniform vec2 offset;
-    varying vec2 vUv;
-    void main() {
-      vec4 color;
-      color.r = texture2D(tDiffuse, vUv + offset).r;
-      color.g = texture2D(tDiffuse, vUv).g;
-      color.b = texture2D(tDiffuse, vUv - offset).b;
-      color.a = 1.0;
-      gl_FragColor = color;
+    varying vec2 fragTexCoord;
+    varying vec3 fragNormal;
+
+    void main()
+    {
+      vec3 surfaceNormal = normalize(fragNormal);
+      vec3 normDir = normalize(directionalLight.direction);
+      vec4 texel = texture2D(texSampler, fragTexCoord);
+
+      vec3 lightIntensity = ambientLightIntensity +
+        directionalLight.color * max(dot(fragNormal, normDir), 0.0);
+
+      gl_FragColor = vec4(texel.rgb * lightIntensity, texel.a);
     }
   `
 };
+// End AI Assisted Code
 
 // Create two separate renderers
 const renderer1 = new THREE.WebGLRenderer({ canvas: canvas1 });

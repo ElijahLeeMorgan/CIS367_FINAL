@@ -12,7 +12,7 @@
   <script type="text/javascript">
     // Change the label of the second canvas.
     function changeCanvas2Label() {
-      const label2 = document.getElementById("webgl-canvas-2").previousElementSibling;
+      const label2 = document.getElementById("label-webgl-canvas-2");
       if (label2.innerText === "Chromatic Aberration") {
         label2.innerText = "Chromatic Aberration + Cube-map";
       } else {
@@ -26,12 +26,12 @@
   <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; margin: auto; margin-top: 35px;">
     <div class="label-canvas-container">
 
-      <label for="webgl-canvas-1">Basic</label>
-      <canvas id="webgl-canvas-1" width="500" height="500"></canvas>
+      <label id="label-webgl-canvas-1">Basic</label>
+      <canvas id="webgl-canvas-1" width="500" height="500" aria-labelledby="label-webgl-canvas-1"></canvas>
     </div>
     <div class="label-canvas-container">
-      <label for="webgl-canvas-2">Chromatic Aberration</label>
-      <canvas id="webgl-canvas-2" width="500" height="500"></canvas>
+      <label id="label-webgl-canvas-2">Chromatic Aberration</label>
+      <canvas id="webgl-canvas-2" width="500" height="500" aria-labelledby="label-webgl-canvas-2"></canvas>
 
     </div>
   </div>
@@ -47,10 +47,10 @@
     <button id="map-button" onclick="handleButtonClick('map'); changeCanvas2Label();">Cube-map</button>
   </center>
   <center>
-    <label for="quantity">Aberration X: </label>
+    <label for="AX">Aberration X: </label>
     <input type="number" min="-1000" max="1000" step=".001" value=".001" id="AX">
 
-    <label for="quantity">Aberration Y: </label>
+    <label for="AY">Aberration Y: </label>
     <input type="number" min="-1000" max="1000" step=".001" value=".001" id="AY">
 
     <h3>CIS367-02 FINAL PROJECT</h3>
