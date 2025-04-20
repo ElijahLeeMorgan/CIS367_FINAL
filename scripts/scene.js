@@ -74,7 +74,8 @@ const loader = new GLTFLoader();
 
 const composer2 = new EffectComposer(renderer2);
 composer2.addPass(new RenderPass(scene, camera));
-composer2.addPass(new ShaderPass(ChromaticAberrationShader));
+const chromaticPass = new ShaderPass(ChromaticAberrationShader);
+composer2.addPass(chromaticPass);
 
 let angle = 0;
 let radius = 5;

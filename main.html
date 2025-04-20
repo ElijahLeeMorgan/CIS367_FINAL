@@ -9,6 +9,18 @@
     import { handleButtonClick } from './scripts/scene.js';
     window.handleButtonClick = handleButtonClick;
   </script>
+  <script type="text/javascript">
+    // Change the label of the second canvas.
+    function changeCanvas2Label() {
+      const label2 = document.getElementById("webgl-canvas-2").previousElementSibling;
+      if (label2.innerText === "Chromatic Aberration") {
+        label2.innerText = "Chromatic Aberration + Cube-map";
+      } else {
+        label2.innerText = "Chromatic Aberration";
+      }
+      console.log("Label2 updated: " + label2.innerText);
+    }
+  </script>
 </head>
 <body>
   <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; margin: auto; margin-top: 35px;">
@@ -32,7 +44,7 @@
   </center>
   <center>
     <button id="rotate-button" onclick="handleButtonClick('rotate')">Rotate</button>
-    <button id="map-button" onclick="handleButtonClick('map')">Cube-map</button>
+    <button id="map-button" onclick="handleButtonClick('map'); changeCanvas2Label();">Cube-map</button>
   </center>
   <center>
     <label for="quantity">Aberration X: </label>
