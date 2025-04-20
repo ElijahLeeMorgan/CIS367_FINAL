@@ -49,42 +49,60 @@ const ChromaticAberrationShader = {
   fragmentShader: CAFrag
 };
 
-const phongShader = { //WIP
-  uniforms: {
-    ambientLightIntesity: new THREE.Vector3(),
-    directionalLight: { // Effectively a struct, 
-      direction: new THREE.Vector3(),
-      color: new THREE.Vector3(1, 1, 1),
-    },
-    texSampler: new THREE.Texture(cubeTexture), // Effectively WebGl's sampler2D
-  },
-  vertexShader: `
-    varying vec2 vUv;
+const PFrag = `
+    uniform vec3 ambientLightIntensity;
+    uniform vec3 lightDirection;
+    uniform vec3 lightColor;
+
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
     void main() {
-      vUv = uv;
+      // Ambient component
+      vec3 ambient = ambientLightIntensity;
+
+      // Diffuse component
+      vec3 normal = normalize(vNormal);
+      float diffuseFactor = max(dot(normal, -lightDirection), 0.0);
+      vec3 diffuse = diffuseFactor * lightColor;
+
+      // Specular component
+      vec3 viewDir = normalize(-vPosition);
+      vec3 reflectDir = reflect(lightDirection, normal);
+      float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
+      vec3 specular = specularFactor * lightColor;
+
+      // Combine components
+      vec3 color = ambient + diffuse + specular;
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `;
+const PVert = `
+    precision mediump float;
+
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+      vNormal = normalize(normalMatrix * normal);
+      vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
-  `,
-  fragmentShader: `
-    varying vec2 fragTexCoord;
-    varying vec3 fragNormal;
-
-    void main()
-    {
-      vec3 surfaceNormal = normalize(fragNormal);
-      vec3 normDir = normalize(directionalLight.direction);
-      vec4 texel = texture2D(texSampler, fragTexCoord);
-
-      vec3 lightIntensity = ambientLightIntensity +
-        directionalLight.color * max(dot(fragNormal, normDir), 0.0);
-
-      gl_FragColor = vec4(texel.rgb * lightIntensity, texel.a);
-    }
-  `
+  `;
+  
+const phongShader = {
+  uniforms: {
+    ambientLightIntensity: { value: new THREE.Vector3(0.5, 0.5, 0.5) },
+    lightDirection: { 
+      value: new THREE.Vector3(1, 1, -1).normalize().negate() // Pointing towards 0,0,0
+    },
+    lightColor: { value: new THREE.Vector3(1, 1, 1) },
+  },
+  vertexShader: PVert,
+  fragmentShader: PFrag
 };
-// End AI Assisted Code
 
-// Create two separate renderers
+// Create two separate renderers. No effects, effects applied.
 const renderer1 = new THREE.WebGLRenderer({ canvas: canvas1 });
 const renderer2 = new THREE.WebGLRenderer({ canvas: canvas2 });
 
@@ -100,16 +118,26 @@ const camera = new THREE.PerspectiveCamera(100, 1, 0.1, 1000);
 camera.position.z = 5;
 
 // Add a simple directional light to the scene
-const sunlight = new THREE.DirectionalLight(0xffffff, 10);
-sunlight.position.set(1, 1, 7.5);
-scene.add(sunlight);
+//NOTE handled by phong shader
+//const sunlight = new THREE.DirectionalLight(0xffffff, 10);
+//sunlight.position.set(1, 1, 7.5);
+//scene.add(sunlight);
 
 // Path to GLB/GLTF model
 const loader = new GLTFLoader();
 
+const composer1 = new EffectComposer(renderer1);
+composer1.addPass(new RenderPass(scene, camera));
+composer1.addPass(new ShaderPass(phongShader));
+
 const composer2 = new EffectComposer(renderer2);
 composer2.addPass(new RenderPass(scene, camera));
+// Phong shader pass
+const phongPass = new ShaderPass(phongShader);
+composer2.addPass(phongPass);
+// Chromatic aberration pass
 const chromaticPass = new ShaderPass(ChromaticAberrationShader);
+chromaticPass.renderToScreen = true; //AKA last effect before rendering.
 composer2.addPass(chromaticPass);
 
 let angle = 0;
@@ -144,10 +172,14 @@ function updateCameraControls() {
 
 function cube(x, y, z, color, shine) {
   const cubeGeometry = new THREE.BoxGeometry(x, y, z);
-  const cubeMaterial = new THREE.MeshPhongMaterial({color, shine});
+  const cubeMaterial = new THREE.ShaderMaterial({
+    uniforms: THREE.UniformsUtils.clone(phongShader.uniforms), // Clone uniforms to avoid sharing state
+    vertexShader: phongShader.vertexShader,
+    fragmentShader: phongShader.fragmentShader,
+  });
   const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
   cube.position.set(1, 0, 0); // Optional offset
-  return cube
+  return cube;
 }
 
 function clear() {
