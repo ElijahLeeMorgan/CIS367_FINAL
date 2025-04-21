@@ -4,7 +4,7 @@ import { EffectComposer } from 'https://esm.sh/three@0.174.0/examples/jsm/postpr
 import { RenderPass } from 'https://esm.sh/three@0.174.0/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'https://esm.sh/three@0.174.0/examples/jsm/postprocessing/ShaderPass.js';  
 
-// AI Assisted Code. The whole file (or at least msot of it) is AI assisted.
+// AI Assisted Code
 // It's a lot easier setting up the scene with 3JS than using raw WebGL.
 // However, our effect code will be written in raw WebGL (see models).
 // Get references to both canvases
@@ -21,42 +21,11 @@ const cubeTexture = cubeTextureLoader.load([
   '/textures/negz.jpg', // -Z
 ]);
 
-// Chromatic Aberration Shader
-const CAFrag = `
-  uniform sampler2D tDiffuse;
-  uniform vec2 offset;
-  varying vec2 vUv;
-  void main() {
-    vec4 color;
-    color.r = texture2D(tDiffuse, vUv + offset).r;
-    color.g = texture2D(tDiffuse, vUv).g;
-    color.b = texture2D(tDiffuse, vUv - offset).b;
-    color.a = 1.0;
-    gl_FragColor = color;
-  }`;
-const CAVert = `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }`
+
 const ChromaticAberrationShader = {
   uniforms: {
     tDiffuse: { value: null },
     offset: { value: new THREE.Vector2(0.005, 0.005) },
-  },
-  vertexShader: CAVert,
-  fragmentShader: CAFrag
-};
-
-const phongShader = { //WIP
-  uniforms: {
-    ambientLightIntesity: new THREE.Vector3(),
-    directionalLight: { // Effectively a struct, 
-      direction: new THREE.Vector3(),
-      color: new THREE.Vector3(1, 1, 1),
-    },
-    texSampler: new THREE.Texture(cubeTexture), // Effectively WebGl's sampler2D
   },
   vertexShader: `
     varying vec2 vUv;
@@ -66,23 +35,72 @@ const phongShader = { //WIP
     }
   `,
   fragmentShader: `
-    varying vec2 fragTexCoord;
-    varying vec3 fragNormal;
-
-    void main()
-    {
-      vec3 surfaceNormal = normalize(fragNormal);
-      vec3 normDir = normalize(directionalLight.direction);
-      vec4 texel = texture2D(texSampler, fragTexCoord);
-
-      vec3 lightIntensity = ambientLightIntensity +
-        directionalLight.color * max(dot(fragNormal, normDir), 0.0);
-
-      gl_FragColor = vec4(texel.rgb * lightIntensity, texel.a);
+    uniform sampler2D tDiffuse;
+    uniform vec2 offset;
+    varying vec2 vUv;
+    void main() {
+      vec4 color;
+      color.r = texture2D(tDiffuse, vUv + offset).r;
+      color.g = texture2D(tDiffuse, vUv).g;
+      color.b = texture2D(tDiffuse, vUv - offset).b;
+      color.a = 1.0;
+      gl_FragColor = color;
     }
   `
 };
-// End AI Assisted Code
+
+const PFrag = `
+    uniform vec3 ambientLightIntensity;
+    uniform vec3 lightDirection;
+    uniform vec3 lightColor;
+
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+      // Ambient component
+      vec3 ambient = ambientLightIntensity;
+
+      // Diffuse component
+      vec3 normal = normalize(vNormal);
+      float diffuseFactor = max(dot(normal, -lightDirection), 0.0);
+      vec3 diffuse = diffuseFactor * lightColor;
+
+      // Specular component
+      vec3 viewDir = normalize(-vPosition);
+      vec3 reflectDir = reflect(lightDirection, normal);
+      float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
+      vec3 specular = specularFactor * lightColor;
+
+      // Combine components
+      vec3 color = ambient + diffuse + specular;
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `;
+const PVert = `
+    precision mediump float;
+
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+      vNormal = normalize(normalMatrix * normal);
+      vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `;
+
+const phongShader = {
+  uniforms: {
+    ambientLightIntensity: { value: new THREE.Vector3(0.5, 0.5, 0.5) },
+    lightDirection: { 
+      value: new THREE.Vector3(1, 1, -1).normalize().negate() // Pointing towards 0,0,0
+    },
+    lightColor: { value: new THREE.Vector3(1, 1, 1) },
+  },
+  vertexShader: PVert,
+  fragmentShader: PFrag
+};
 
 // Create two separate renderers
 const renderer1 = new THREE.WebGLRenderer({ canvas: canvas1 });
@@ -107,9 +125,10 @@ scene.add(sunlight);
 // Path to GLB/GLTF model
 const loader = new GLTFLoader();
 
+const chromaticPass = new ShaderPass(ChromaticAberrationShader);
+
 const composer2 = new EffectComposer(renderer2);
 composer2.addPass(new RenderPass(scene, camera));
-const chromaticPass = new ShaderPass(ChromaticAberrationShader);
 composer2.addPass(chromaticPass);
 
 let angle = 0;
@@ -143,11 +162,18 @@ function updateCameraControls() {
 }
 
 function cube(x, y, z, color, shine) {
-  const cubeGeometry = new THREE.BoxGeometry(x, y, z);
-  const cubeMaterial = new THREE.MeshPhongMaterial({color, shine});
-  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-  cube.position.set(1, 0, 0); // Optional offset
-  return cube
+  const geometry = new THREE.BoxGeometry(x, y, z);
+
+  const material = new THREE.ShaderMaterial({
+    uniforms: THREE.UniformsUtils.clone(phongShader.uniforms),
+    vertexShader: phongShader.vertexShader,
+    fragmentShader: phongShader.fragmentShader,
+    lights: false,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(1, 0, 0); // Optional offset
+  return mesh;
 }
 
 function clear() {
@@ -224,7 +250,6 @@ export function handleButtonClick(fileName) {
 
 let pitch = 0; // camera rotation around X axis (looking up/down)
 const rotationSpeed = 0.02;
-
 const axInput = document.getElementById('AX');
 const ayInput = document.getElementById('AY');
 
