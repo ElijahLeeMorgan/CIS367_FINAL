@@ -1,8 +1,11 @@
 ![CIS367-02 FINAL PROJECT by ELijah Morgan & Dillon Moesch](./img/wordart.png)
 
-### Included Shader Effects
+## Shader Effects
+![demo](./img/demo.png)
 * Chromatic Aberration
 * Cubemap
+* Phong Shading
+* Texture Mapping via [Three.JS](https://threejs.org/)
 
 ### Requirements
 * Any modern browser capable of running Javascript.
